@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
   private static final String TAG = NsdServiceFinderAndResolver.class.getSimpleName();
 
-  private static final long BROWSE_SERVICE_TIMEOUT_MS = 5000L;
+  private static final long BROWSE_SERVICE_TIMEOUT_MS = 30 * 1000L;
 
   private final NsdManager nsdManager;
   private final NsdServiceInfo targetServiceInfo;
@@ -71,9 +71,6 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
   public void start() {
     multicastLock.acquire();
 
-    this.nsdManager.discoverServices(
-        targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
-
     NsdServiceFinderAndResolver serviceFinderResolver = this;
     this.stopDiscoveryRunnable =
         Executors.newSingleThreadScheduledExecutor()
@@ -92,6 +89,9 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 },
                 BROWSE_SERVICE_TIMEOUT_MS,
                 TimeUnit.MILLISECONDS);
+
+    this.nsdManager.discoverServices(
+        targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
   }
 
   @Override

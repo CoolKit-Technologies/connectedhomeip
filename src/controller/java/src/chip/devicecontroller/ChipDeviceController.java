@@ -280,6 +280,10 @@ public class ChipDeviceController {
     updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
   }
 
+  public void stopDevicePairing(long deviceId) {
+    stopDevicePairing(deviceControllerPtr, deviceId);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -913,6 +917,14 @@ public class ChipDeviceController {
   public native byte[] extractSkidFromPaaCert(byte[] paaCert);
 
   /**
+   * Extract akid from api cert.
+   *
+   * @param paiCert PAI cert
+   * @return The authority key identifier (AKID)
+   */
+  public native byte[] extractAkidFromPaiCert(byte[] paiCert);
+
+  /**
    * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
@@ -1068,6 +1080,8 @@ public class ChipDeviceController {
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
+
+  private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
   private native void shutdownSubscriptions(
       long deviceControllerPtr,

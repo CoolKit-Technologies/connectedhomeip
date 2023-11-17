@@ -96,6 +96,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     bool isConnected = false;
+    ChipLogProgress(Discovery, "safasfsadf 11111111111");
 
     //
     // Always enqueue our user provided callbacks into our callback list.
@@ -103,6 +104,8 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     // a previous iteration which in theory shouldn't happen, but this is written to be more defensive)
     //
     EnqueueConnectionCallbacks(onConnection, onFailure);
+
+    ChipLogProgress(Discovery, "safasfsadf 2222222222222");
 
     switch (mState)
     {
@@ -163,6 +166,8 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
         MoveToState(State::SecureConnected);
     }
 
+    ChipLogProgress(Discovery, "safasfsadf 333333333333");
+
     //
     // Dequeue all our callbacks on either encountering an error
     // or if we successfully connected. Both should not be set
@@ -170,6 +175,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     //
     if (err != CHIP_NO_ERROR || isConnected)
     {
+        ChipLogProgress(Discovery, "safasfsadf 444444444444");
         DequeueConnectionCallbacks(err);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         // While it is odd to have an explicit return here at the end of the function, we do so
@@ -334,17 +340,21 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 
     if (CHIP_ERROR_TIMEOUT == error)
     {
+        ChipLogError(Discovery, "OnSessionEstablishmentError 11111111 ");
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         // Make a copy of the ReliableMessageProtocolConfig, since our
         // mCaseClient is about to go away once we change state.
         ReliableMessageProtocolConfig remoteMprConfig = mCASEClient->GetRemoteMRPIntervals();
 #endif
 
+        ChipLogError(Discovery, "OnSessionEstablishmentError 2222222222 ");
         // Move to the ResolvingAddress state, in case we have more results,
         // since we expect to receive results in that state.
         MoveToState(State::ResolvingAddress);
+        ChipLogError(Discovery, "OnSessionEstablishmentError 33333333 ");
         if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
         {
+            ChipLogError(Discovery, "OnSessionEstablishmentError 444444444 ");
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
             // Our retry has already been kicked off.
             NotifyRetryHandlers(error, remoteMprConfig, System::Clock::kZero);
@@ -352,18 +362,24 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
             return;
         }
 
+        ChipLogError(Discovery, "OnSessionEstablishmentError 5555555 ");
         // Moving back to the Connecting state would be a bit of a lie, since we
         // don't have an mCASEClient.  Just go back to NeedsAddress, since
         // that's really where we are now.
         MoveToState(State::NeedsAddress);
 
+        ChipLogError(Discovery, "OnSessionEstablishmentError 6666666 ");
+
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         if (mRemainingAttempts > 0)
         {
+            ChipLogError(Discovery, "OnSessionEstablishmentError 777777 ");
             System::Clock::Seconds16 reattemptDelay;
             CHIP_ERROR err = ScheduleSessionSetupReattempt(reattemptDelay);
+            ChipLogError(Discovery, "OnSessionEstablishmentError 888888 ");
             if (err == CHIP_NO_ERROR)
             {
+                ChipLogError(Discovery, "OnSessionEstablishmentError 9999999 ");
                 MoveToState(State::WaitingForRetry);
                 NotifyRetryHandlers(error, remoteMprConfig, reattemptDelay);
                 return;
@@ -371,6 +387,8 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     }
+
+    ChipLogError(Discovery, "OnSessionEstablishmentError 0000000 ");
 
     DequeueConnectionCallbacks(error);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.

@@ -131,9 +131,10 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
     ClusterBase cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
-
+    ChipLogProgress(Controller, "Already create cluster");
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
+        ChipLogProgress(Controller, "option is not setupcode");
         chip::Spake2pVerifierSerialized serializedVerifier;
         MutableByteSpan serializedVerifierSpan(serializedVerifier);
         ReturnErrorOnFailure(mVerifier.Serialize(serializedVerifierSpan));
@@ -145,13 +146,16 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
         request.iterations           = mPBKDFIterations;
         request.salt                 = mPBKDFSalt;
 
+        ChipLogProgress(Controller, "ready to send command");
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
                                                    OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
     }
     else
     {
+        ChipLogProgress(Controller, "option is setupcode");
         AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
+        ChipLogProgress(Controller, "ready to send command");
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
                                                    OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
     }
